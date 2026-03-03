@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Enzi App Icon - Border Collie Meal Tracker -->
+  <!-- Rounded square background -->
+  <rect x="0" y="0" width="512" height="512" rx="96" ry="96" fill="#FFFBEB"/>
+
+  <!-- Subtle inner shadow/border for depth -->
+  <rect x="4" y="4" width="504" height="504" rx="92" ry="92" fill="none" stroke="#F59E0B" stroke-opacity="0.15" stroke-width="4"/>
+
+  <!-- Paw print centered in the icon -->
+  <g transform="translate(256, 270)">
+    <!-- Main pad (large bottom oval) -->
+    <ellipse cx="0" cy="40" rx="72" ry="56" fill="#F59E0B"/>
+
+    <!-- Toe pads - four toes arranged in an arc above the main pad -->
+    <!-- Left outer toe -->
+    <ellipse cx="-78" cy="-40" rx="30" ry="38" fill="#F59E0B" transform="rotate(-15 -78 -40)"/>
+    <!-- Left inner toe -->
+    <ellipse cx="-30" cy="-72" rx="28" ry="36" fill="#F59E0B" transform="rotate(-5 -30 -72)"/>
+    <!-- Right inner toe -->
+    <ellipse cx="30" cy="-72" rx="28" ry="36" fill="#F59E0B" transform="rotate(5 30 -72)"/>
+    <!-- Right outer toe -->
+    <ellipse cx="78" cy="-40" rx="30" ry="38" fill="#F59E0B" transform="rotate(15 78 -40)"/>
+  </g>
+</svg>

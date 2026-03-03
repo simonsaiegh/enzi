@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Paw print icon for Enzi - Border Collie Meal Tracker -->
+  <!-- Main pad (large bottom oval) -->
+  <ellipse cx="16" cy="22" rx="7" ry="5.5" fill="#F59E0B"/>
+  <!-- Toe pads -->
+  <ellipse cx="8.5" cy="13" rx="3.2" ry="3.8" fill="#F59E0B" transform="rotate(-10 8.5 13)"/>
+  <ellipse cx="15" cy="10" rx="3" ry="3.5" fill="#F59E0B"/>
+  <ellipse cx="21.5" cy="11" rx="3" ry="3.5" fill="#F59E0B" transform="rotate(10 21.5 11)"/>
+  <ellipse cx="26" cy="16" rx="2.5" ry="3.2" fill="#F59E0B" transform="rotate(25 26 16)"/>
+</svg>

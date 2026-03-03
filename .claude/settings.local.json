@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --version)",
+      "Bash(npm --version)",
+      "Bash(npx --version)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --use-npm --skip-install)",
+      "Bash(npm install)",
+      "Bash(npx shadcn@latest add button card dialog toast input label select switch textarea skeleton badge separator sheet -y)",
+      "Bash(npx next build)",
+      "Bash(npx tsc)",
+      "Bash(npx tsc --noEmit)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(where npx)",
+      "Bash(where node)",
+      "Bash(ls \"C:/Users/simon/OneDrive/Documentos/enzo/node_modules/.bin/next\"*)",
+      "Bash(node -e \"console.log\\(require.resolve\\(''next/dist/bin/next''\\)\\)\")"
+    ]
+  }
+}
