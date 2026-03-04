@@ -2,7 +2,8 @@
 
 export const dynamic = "force-dynamic";
 
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Tag,
   Plus,
@@ -11,6 +12,8 @@ import {
   Cookie,
   Pill,
   Utensils,
+  Trash2,
+  Loader2,
   type LucideIcon,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
@@ -18,6 +21,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useDispensers } from "@/lib/hooks/use-dispensers";
+import { deleteDispenser } from "@/lib/firebase/firestore";
 import Link from "next/link";
 
 const iconMap: Record<string, LucideIcon> = {
@@ -30,6 +34,24 @@ const iconMap: Record<string, LucideIcon> = {
 
 export default function DispensadoresPage() {
   const { dispensers, isLoading } = useDispensers();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDelete = async (id: string, name: string) => {
+    const confirmed = window.confirm(
+      `¿Seguro que querés eliminar "${name}"?\nSe eliminarán también los tokens NFC asociados.`
+    );
+    if (!confirmed) return;
+
+    setDeletingId(id);
+    try {
+      await deleteDispenser(id);
+    } catch (err) {
+      console.error("Error deleting dispenser:", err);
+      alert("No se pudo eliminar el dispensador.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <AppShell>
@@ -86,45 +108,62 @@ export default function DispensadoresPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {dispensers.map((d, i) => {
-              const Icon = iconMap[d.icon] || Utensils;
-              return (
-                <motion.div
-                  key={d.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                >
-                  <Card className="p-4">
-                    <div className="flex items-start gap-3">
-                      <div
-                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
-                        style={{ backgroundColor: `${d.color}20` }}
-                      >
-                        <Icon
-                          className="h-5 w-5"
-                          style={{ color: d.color }}
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold">{d.name}</p>
-                        <div className="mt-1 flex flex-wrap gap-1.5">
-                          <Badge variant="secondary" className="text-[10px]">
-                            {d.defaultAmountGrams}g
-                          </Badge>
-                          <Badge variant="secondary" className="text-[10px]">
-                            {d.mode === "auto" ? "Auto" : "Confirmar"}
-                          </Badge>
-                          <Badge variant="secondary" className="text-[10px]">
-                            {d.antiDuplicateWindowSeconds}s anti-dup
-                          </Badge>
+            <AnimatePresence>
+              {dispensers.map((d, i) => {
+                const Icon = iconMap[d.icon] || Utensils;
+                return (
+                  <motion.div
+                    key={d.id}
+                    layout
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, x: -100, height: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                  >
+                    <Card className="p-4">
+                      <div className="flex items-start gap-3">
+                        <div
+                          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+                          style={{ backgroundColor: `${d.color}20` }}
+                        >
+                          <Icon
+                            className="h-5 w-5"
+                            style={{ color: d.color }}
+                          />
                         </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold">{d.name}</p>
+                          <div className="mt-1 flex flex-wrap gap-1.5">
+                            <Badge variant="secondary" className="text-[10px]">
+                              {d.defaultAmountGrams}g
+                            </Badge>
+                            <Badge variant="secondary" className="text-[10px]">
+                              {d.mode === "auto" ? "Auto" : "Confirmar"}
+                            </Badge>
+                            <Badge variant="secondary" className="text-[10px]">
+                              {d.antiDuplicateWindowSeconds}s anti-dup
+                            </Badge>
+                          </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-9 w-9 shrink-0 text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
+                          onClick={() => handleDelete(d.id, d.name)}
+                          disabled={deletingId === d.id}
+                        >
+                          {deletingId === d.id ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                        </Button>
                       </div>
-                    </div>
-                  </Card>
-                </motion.div>
-              );
-            })}
+                    </Card>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           </div>
         )}
       </div>

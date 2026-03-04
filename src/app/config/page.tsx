@@ -3,15 +3,16 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Settings, Moon, Sun, Dog, Info } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Settings, Moon, Sun, Dog, Info, Trash2, Loader2 } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/auth-provider";
 import { useTheme } from "next-themes";
-import { getAllMembers } from "@/lib/firebase/firestore";
+import { getAllMembers, deleteMember } from "@/lib/firebase/firestore";
 import type { Member } from "@/lib/types";
 import { APP_NAME, PET_NAME, PET_BREED } from "@/lib/utils/constants";
 
@@ -21,6 +22,7 @@ export default function ConfigPage() {
   const [members, setMembers] = useState<Record<string, Member>>({});
   const [membersLoaded, setMembersLoaded] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -31,6 +33,32 @@ export default function ConfigPage() {
   }, []);
 
   const isDark = mounted && theme === "dark";
+
+  const handleDeleteMember = async (memberId: string, memberName: string) => {
+    if (memberId === uid) {
+      alert("No podés eliminarte a vos mismo.");
+      return;
+    }
+    const confirmed = window.confirm(
+      `¿Seguro que querés eliminar a "${memberName}" de la familia?`
+    );
+    if (!confirmed) return;
+
+    setDeletingId(memberId);
+    try {
+      await deleteMember(memberId);
+      setMembers((prev) => {
+        const next = { ...prev };
+        delete next[memberId];
+        return next;
+      });
+    } catch (err) {
+      console.error("Error deleting member:", err);
+      alert("No se pudo eliminar el miembro.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <AppShell>
@@ -93,21 +121,45 @@ export default function ConfigPage() {
             Familia
           </p>
           <Card className="p-0 divide-y divide-border">
-            {Object.entries(members).map(([id, member]) => (
-              <div key={id} className="flex items-center justify-between p-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                    {member.name.charAt(0).toUpperCase()}
+            <AnimatePresence>
+              {Object.entries(members).map(([id, member]) => (
+                <motion.div
+                  key={id}
+                  layout
+                  exit={{ opacity: 0, x: -100, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="flex items-center justify-between p-4"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                      {member.name.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-sm font-medium">{member.name}</span>
                   </div>
-                  <span className="text-sm font-medium">{member.name}</span>
-                </div>
-                {id === uid && (
-                  <Badge variant="secondary" className="text-[10px]">
-                    Vos
-                  </Badge>
-                )}
-              </div>
-            ))}
+                  <div className="flex items-center gap-2">
+                    {id === uid ? (
+                      <Badge variant="secondary" className="text-[10px]">
+                        Vos
+                      </Badge>
+                    ) : (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
+                        onClick={() => handleDeleteMember(id, member.name)}
+                        disabled={deletingId === id}
+                      >
+                        {deletingId === id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
             {Object.keys(members).length === 0 && (
               <div className="p-4 text-center text-sm text-muted-foreground">
                 {membersLoaded ? "Sin miembros registrados" : "Cargando miembros..."}

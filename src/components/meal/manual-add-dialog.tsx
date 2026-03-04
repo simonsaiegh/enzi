@@ -66,9 +66,13 @@ export function ManualAddDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-1.5">
+        <Button
+          size="sm"
+          className="gap-1.5 bg-white/25 backdrop-blur-sm border-white/30 text-white hover:bg-white/35 shadow-lg"
+          style={{ textShadow: "0 1px 2px rgba(0,0,0,0.2)" }}
+        >
           <Plus className="h-4 w-4" />
-          Agregar manual
+          Agregar
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-[calc(100vw-2rem)] rounded-2xl sm:max-w-sm">

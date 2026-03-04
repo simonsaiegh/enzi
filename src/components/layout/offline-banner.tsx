@@ -1,11 +1,20 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { WifiOff } from "lucide-react";
 import { useOffline } from "@/providers/offline-provider";
 
 export function OfflineBanner() {
   const { isOnline, queueSize } = useOffline();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Don't render on server to avoid hydration mismatch
+  if (!mounted) return null;
 
   return (
     <AnimatePresence>

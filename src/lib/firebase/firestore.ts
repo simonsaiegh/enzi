@@ -3,6 +3,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  deleteDoc,
   query,
   where,
   orderBy,
@@ -40,6 +41,11 @@ export async function getAllMembers(): Promise<Record<string, Member>> {
   return members;
 }
 
+export async function deleteMember(memberId: string): Promise<void> {
+  if (!db) return;
+  await deleteDoc(doc(db, "members", memberId));
+}
+
 // --- Dispensers ---
 
 export function subscribeDispensers(
@@ -71,6 +77,20 @@ export async function getDispenser(id: string): Promise<Dispenser | null> {
   return snap.exists()
     ? ({ id: snap.id, ...snap.data() } as Dispenser)
     : null;
+}
+
+export async function deleteDispenser(dispenserId: string): Promise<void> {
+  if (!db) return;
+  // Delete associated tokens first
+  const tokensSnap = await getDocs(
+    query(collection(db, "tokens"), where("dispenserId", "==", dispenserId))
+  );
+  const deletePromises = tokensSnap.docs.map((d) =>
+    deleteDoc(doc(db, "tokens", d.id))
+  );
+  await Promise.all(deletePromises);
+  // Delete the dispenser
+  await deleteDoc(doc(db, "dispensers", dispenserId));
 }
 
 // --- Events ---
